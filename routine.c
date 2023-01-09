@@ -6,26 +6,23 @@
 /*   By: sbejaoui <sbejaoui@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/24 21:50:08 by sbejaoui          #+#    #+#             */
-/*   Updated: 2023/01/09 18:47:53 by sbejaoui         ###   ########.fr       */
+/*   Updated: 2022/01/31 18:00:06 by sbejaoui         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosopher.h"
-#include "libft.h"
 
 void	ft_isdying(t_env *table)
 {
-	// ft_putnbr_fd(table->mphilo->pos, 1);
-	// ft_putstr_fd(" Philo time from sleep : ", 1);
-	// ft_putnbr_fd((int)time_ms(&table->mphilo->etime, &table->mphilo->end), 1);
-	// ft_putstr_fd("\n", 1);
-	if (time_ms(&table->mphilo->etime, &table->mphilo->end) >= (unsigned long long)table->set->ttd)
+	if (time_ms(&table->mphilo->etime, &table->mphilo->end) > table->set->ttd)
 		ft_writertn(table, DIE);
+	if (time_ms(&table->mphilo->etime, &table->mphilo->end)
+		>= table->set->ttd / 2)
+		table->mphilo->hungry = 1;
 }
 
 void	ft_wait(t_env *table, int event)
 {
-	ft_isdying(table);
 	if (event == 1)
 		ft_sleep(table->set->tte, table);
 	else if (event == 2)
@@ -59,7 +56,6 @@ void	ft_writertn(t_env *table, int event)
 		pthread_mutex_unlock(table->write);
 		if (event >= 1 && event <= 3)
 			ft_wait(table, event);
-		ft_isdying(table);
 	}
 	else
 		pthread_mutex_unlock(table->write);
@@ -73,13 +69,14 @@ void	ft_eat(t_env *table)
 		table->mphilo->myforkl = 1;
 		ft_writertn(table, FRK);
 	}
-	else if (table->mphilo->left && *table->mphilo->right && !*table->dead)
+	else if (table->mphilo->left && *table->mphilo->right)
 	{
-		// ft_isdying(table);
 		pthread_mutex_lock(table->mphilo->forkl);
 		pthread_mutex_lock(table->mphilo->forkr);
 		if (!*table->dead && *table->mphilo->left)
+		{
 			ft_triche2(table);
+		}
 		if (!*table->dead && table->mphilo->myforkl)
 			ft_triche3(table);
 		else
@@ -88,6 +85,8 @@ void	ft_eat(t_env *table)
 			pthread_mutex_unlock(table->mphilo->forkr);
 		}
 	}
+	else if (!table->mphilo->hthinked)
+		ft_writertn(table, THINK);
 }
 
 void	*ft_routine(void *tmp)
@@ -100,12 +99,11 @@ void	*ft_routine(void *tmp)
 	table->mphilo = tpm;
 	while (1)
 	{
-		// ft_putnbr_fd(*table->dead, 1);
-		// ft_putstr_fd("\n", 1);
 		if (*table->dead)
 			return (NULL);
-		ft_eat(table);
-		if (!table->mphilo->hthinked)
+		else if (table->mphilo->hungry || table->mphilo->hthinked)
+			ft_eat(table);
+		else if (!table->mphilo->hthinked)
 			ft_writertn(table, THINK);
 		ft_isdying(table);
 	}

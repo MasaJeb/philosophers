@@ -6,7 +6,7 @@
 /*   By: sbejaoui <sbejaoui@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/27 23:38:27 by sbejaoui          #+#    #+#             */
-/*   Updated: 2023/01/09 18:38:02 by sbejaoui         ###   ########.fr       */
+/*   Updated: 2022/01/31 17:35:12 by sbejaoui         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,8 @@ void	ft_sleep(int ms, t_env *table)
 
 	i = 0;
 	gettimeofday(&table->mphilo->stime, NULL);
-	while (time_ms(&table->mphilo->stime, &table->mphilo->end) <= ms)
+	while (time_ms(&table->mphilo->stime,
+			&table->mphilo->end) <= ms)
 		usleep(50);
 	ft_isdying(table);
 }

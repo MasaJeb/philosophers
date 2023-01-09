@@ -17,7 +17,7 @@ BNS =
 
 OBJS = ${SRCS:.c=.o}
 
-VERIF = -Wall -Wextra -Werror
+VERIF = -Wall -Wextra -Werror -ggdb3
 
 CC = gcc
 RM = rm -f
